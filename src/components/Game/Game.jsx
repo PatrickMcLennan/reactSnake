@@ -6,6 +6,7 @@ import {
 	StyledH4,
 	StyledH6,
 	StyledModal,
+	StyledP,
 	StyledSection
 } from './Game.style';
 
@@ -15,16 +16,15 @@ const Game = () => {
 	const { gameInPlay, setGameInPlay, showInstructions, setShowInstructions } = useContext(Context);
 
 	const [countdown, setCountdown] = useState(3);
-	const [coundownFadeout, setCountdownFadeout] = useState();
 
 	const [direction, setDirection] = useState('right');
 
 	const [head, setHead] = useState(51);
-	const [body, setBody] = useState([]);
+	const [body, setBody] = useState([head]);
 	const [tail, setTail] = useState(body.length - 1);
 	const [food, setFood] = useState();
 
-	const nextSquare = direction => {
+	const nextSquare = () => {
 		switch (direction) {
 			case 'up':
 				return head - 10;
@@ -75,7 +75,6 @@ const Game = () => {
 			}
 		};
 		countDownRecursive(countdown);
-		return () => setCountdown(3);
 	}, [!showInstructions]);
 
 	useEffect(() => {
@@ -91,13 +90,14 @@ const Game = () => {
 		window.addEventListener('keydown', ({ keyCode }) => determineDirection(keyCode));
 		return () => {
 			setGameInPlay(false);
+			setCountdown(3);
 			return window.removeEventListener('keydown', determineDirection);
 		};
 	}, []);
 
 	return (
 		<StyledSection>
-			<StyledBoard>
+			<StyledBoard gameInPlay={gameInPlay}>
 				{[...Array(100).keys()].map(number => (
 					<StyledGameCell
 						body={body.includes(number)}
@@ -110,10 +110,10 @@ const Game = () => {
 				<StyledModal>
 					<StyledH4>How To Play</StyledH4>
 
-					<p>
+					<StyledP>
 						Use your arrow keys to direct the head of the snake towards the food. Be careful not to eat your
 						own tail or run into a wall.
-					</p>
+					</StyledP>
 
 					<StyledButton onClick={() => setShowInstructions(false)}>Got it</StyledButton>
 					<StyledButton onClick={() => handleSave()}>Don't show me this again</StyledButton>

@@ -8,7 +8,8 @@ const ContextProvider = ({ children }) => {
 	const [showGreeting, setShowGreeting] = useState(true);
 	const [showHighScores, setShowHighScores] = useState(false);
 	const [showGame, setShowGame] = useState(false);
-	const [showInstructions, setShowInstructions] = useState(localStorage.getItem('mclennanSnake') === null);
+	// const [showInstructions, setShowInstructions] = useState(localStorage.getItem('mclennanSnake') === null);
+	const [showInstructions, setShowInstructions] = useState(true);
 
 	const [topScores, setTopScores] = useState([]);
 

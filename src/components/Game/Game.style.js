@@ -5,13 +5,19 @@ export const StyledBoard = styled.div`
 	display: grid;
 	grid-template-columns: repeat(10, 1fr);
 	grid-template-rows: repeat(10, 1fr);
-	gap: 1px solid black;
 	top: 10%;
 	right: 10%;
 	bottom: 20%;
 	left: 10%;
 	border: 1px solid black;
+	transition: all 0.3s ease-in-out;
 	z-index: -2;
+
+	${({ gameInPlay }) =>
+		!gameInPlay &&
+		css`
+			background-color: rgba(0, 0, 0, 0.4);
+		`}
 `;
 
 export const StyledGameCell = styled.div`
@@ -40,21 +46,45 @@ export const StyledGameCell = styled.div`
 `;
 
 export const StyledModal = styled.div`
+	${({ theme: { flexin } }) => flexin('flex-start', 'center', 'column')}
 	position: absolute;
+	top: 50%;
+	left: 50%;
 	width: 75vw;
+	padding: 25px;
+	background-color: rgba(255, 255, 255, 0.925);
+	border: 1px solid black;
 	font-size: 16px;
 	line-height: 20px;
+	transform: translate(-50%, -50%);
 	z-index: -1;
+
+	& > * {
+		position: relative;
+		z-index: 2;
+	}
 `;
 
 export const StyledH4 = styled.h4`
-	font-size: 20px;
-	line-height: 24px;
+	margin-bottom: 50px;
+	font-size: 50px;
 	text-transform: uppercase;
+`;
+
+export const StyledP = styled.p`
+	margin-bottom: 50px;
+	font-size: 16px;
+	line-height: 20px;
+	letter-spacing: 0.5px;
 `;
 
 export const StyledButton = styled.button`
 	${({ theme: { button } }) => button}
+	width: 50%;
+
+	&:not(:last-of-type) {
+		margin-bottom: 15px;
+	}
 `;
 
 export const StyledSection = styled.section`
