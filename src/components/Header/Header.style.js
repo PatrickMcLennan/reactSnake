@@ -19,6 +19,20 @@ export const StyledButton = styled.button`
 	font-size: 14px;
 	line-height: 18px;
 	text-transform: uppercase;
+	transition: all 0.3s ease-in-out;
+
+	${({ endGameButton }) =>
+		endGameButton &&
+		css`
+			opacity: 0;
+		`}
+
+	${({ gameInPlay, endGameButton }) =>
+		gameInPlay &&
+		endGameButton &&
+		css`
+			opacity: 1;
+		`}
 
 	&[disabled] {
 		cursor: not-allowed;
@@ -29,6 +43,20 @@ export const StyledSpan = styled.span`
 	margin: 0 15px;
 	font-size: 14px;
 	line-height: 18px;
+	transition: all 0.3s ease-in-out;
+
+	${({ endGameButton }) =>
+		endGameButton &&
+		css`
+			opacity: 0;
+		`}
+
+	${({ gameInPlay, endGameButton }) =>
+		gameInPlay &&
+		endGameButton &&
+		css`
+			opacity: 1;
+		`}
 `;
 
 export const StyledHeaderBox = styled.div``;

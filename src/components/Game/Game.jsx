@@ -13,7 +13,7 @@ import {
 import { Context } from 'Context/Context';
 
 const Game = () => {
-	const { gameInPlay, setGameInPlay, showInstructions, setShowInstructions } = useContext(Context);
+	const { gameInPlay, setGameInPlay, showGame, showInstructions, setShowInstructions } = useContext(Context);
 
 	const [countdown, setCountdown] = useState(3);
 
@@ -24,31 +24,29 @@ const Game = () => {
 	const [tail, setTail] = useState(body.length - 1);
 	const [food, setFood] = useState();
 
-	const nextSquare = () => {
+	const moveBody = () => {
 		switch (direction) {
 			case 'up':
-				return head - 10;
+				body.length < 3
+					? setBody([head - 10, head, ...body])
+					: setBody([head - 10, head, ...body].slice(0, [head - 10, head, ...body].length - 1));
+				return setHead(head - 10);
 			case 'bottom':
-				return head + 10;
+				body.length < 3
+					? setBody([head + 10, head, ...body])
+					: setBody([head + 10, head, ...body].slice(0, [head + 10, head, ...body].length - 1));
+				return setHead(head + 10);
 			case 'left':
-				return head + 1;
+				body.length < 3
+					? setBody([head - 1, head, ...body])
+					: setBody([head - 1, head, ...body].slice(0, [head - 1, head, ...body].length - 1));
+				return setHead(head - 1);
 			case 'right':
 			default:
-				return head + 1;
-		}
-	};
-
-	const determineDirection = keyCode => {
-		switch (keyCode) {
-			case 38:
-				return setDirection('up');
-			case 40:
-				return setDirection('bottom');
-			case 37:
-				return setDirection('left');
-			case 39:
-			default:
-				return setDirection('right');
+				body.length < 3
+					? setBody([head + 1, head, ...body])
+					: setBody([head + 1, head, ...body].slice(0, [head + 1, head, ...body].length - 1));
+				return setHead(head + 1);
 		}
 	};
 
@@ -65,33 +63,45 @@ const Game = () => {
 		return setShowInstructions(false);
 	};
 
-	useEffect(() => {
-		const countDownRecursive = number => {
-			if (number > -1) {
-				setCountdown(number);
-				return setTimeout(() => countDownRecursive(number - 1), 1000);
-			} else if (number === -1) {
-				setGameInPlay(true);
-			}
-		};
-		countDownRecursive(countdown);
-	}, [!showInstructions]);
+	const countDownRecursive = number => {
+		if (number > -1) {
+			setCountdown(number);
+			return setTimeout(() => countDownRecursive(number - 1), 1000);
+		} else if (number === -1) {
+			setGameInPlay(true);
+			keepOnRunnin(moveBody);
+		}
+	};
 
-	useEffect(() => {
-		const moveHead = () => {
-			nextSquare();
-			setTimeout(() => moveHead(), 1000);
-		};
-		moveHead();
-	}, [gameInPlay]);
+	const handleDismiss = () => {
+		setShowInstructions(false);
+		return countDownRecursive(countdown);
+	};
+
+	const keepOnRunnin = callback => {
+		callback();
+		console.log(head);
+		return gameInPlay && setTimeout(() => keepOnRunnin(), 1000);
+	};
 
 	useEffect(() => {
 		setFood(placeFood);
-		window.addEventListener('keydown', ({ keyCode }) => determineDirection(keyCode));
+		window.addEventListener('keydown', ({ keyCode }) => {
+			switch (keyCode) {
+				case 38:
+					return setDirection('up');
+				case 40:
+					return setDirection('bottom');
+				case 37:
+					return setDirection('left');
+				case 39:
+				default:
+					return setDirection('right');
+			}
+		});
 		return () => {
 			setGameInPlay(false);
 			setCountdown(3);
-			return window.removeEventListener('keydown', determineDirection);
 		};
 	}, []);
 
@@ -115,7 +125,7 @@ const Game = () => {
 						own tail or run into a wall.
 					</StyledP>
 
-					<StyledButton onClick={() => setShowInstructions(false)}>Got it</StyledButton>
+					<StyledButton onClick={() => handleDismiss()}>Got it</StyledButton>
 					<StyledButton onClick={() => handleSave()}>Don't show me this again</StyledButton>
 				</StyledModal>
 			)}

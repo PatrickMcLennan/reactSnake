@@ -18,7 +18,7 @@ import GithubSVG from 'Component/svgs/GithubSVG';
 import LinkedInSVG from 'Component/svgs/LinkedInSVG';
 
 const Header = () => {
-	const { changePage, gameInPlay, showGreeting, showGame } = useContext(Context);
+	const { changePage, gameInPlay, setGameInPlay, showGreeting, showGame } = useContext(Context);
 
 	return (
 		<StyledNav>
@@ -32,6 +32,12 @@ const Header = () => {
 					<StyledSpan>-</StyledSpan>
 					<StyledButton disabled={gameInPlay} onClick={() => changePage('greeting')}>
 						Home
+					</StyledButton>
+					<StyledSpan gameInPlay={gameInPlay} endGameButton={true}>
+						-
+					</StyledSpan>
+					<StyledButton gameInPlay={gameInPlay} endGameButton={true} onClick={() => setGameInPlay(false)}>
+						End Game
 					</StyledButton>
 				</StyledLinkBox>
 			)}

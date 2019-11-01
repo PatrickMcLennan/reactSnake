@@ -57,7 +57,7 @@ export const StyledModal = styled.div`
 	font-size: 16px;
 	line-height: 20px;
 	transform: translate(-50%, -50%);
-	z-index: -1;
+	z-index: 9999;
 
 	& > * {
 		position: relative;
@@ -74,13 +74,15 @@ export const StyledH4 = styled.h4`
 export const StyledP = styled.p`
 	margin-bottom: 50px;
 	font-size: 16px;
-	line-height: 20px;
+	line-height: 22px;
 	letter-spacing: 0.5px;
+	text-align: center;
 `;
 
 export const StyledButton = styled.button`
 	${({ theme: { button } }) => button}
 	width: 50%;
+	z-index: 9999;
 
 	&:not(:last-of-type) {
 		margin-bottom: 15px;
