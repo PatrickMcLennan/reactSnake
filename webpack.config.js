@@ -11,7 +11,9 @@ module.exports = {
 		publicPath: '/',
 		contentBase: path.join(__dirname, './public'),
 		hot: true,
-		port: 8080
+		port: 8080,
+		writeToDisk: true,
+		open: 'Chrome'
 	},
 	output: {
 		path: path.resolve(__dirname, 'public'),

@@ -17,8 +17,8 @@ const HighScores = () => {
 					</StyledTR>
 				</thead>
 				<tbody>
-					{topScores.map(({ rank, name, score }) => (
-						<StyledTR>
+					{topScores.map(({ rank, name, score }, i) => (
+						<StyledTR key={i}>
 							<StyledTD>{rank}</StyledTD>
 							<StyledTD center={true}>{name}</StyledTD>
 							<StyledTD>{score}</StyledTD>

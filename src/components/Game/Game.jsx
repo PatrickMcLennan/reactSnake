@@ -17,32 +17,74 @@ const Game = () => {
 
 	const [countdown, setCountdown] = useState(3);
 
-	const [direction, setDirection] = useState('right');
+	const [direction, setDirection] = useState(39);
 
 	const [head, setHead] = useState(51);
 	const [body, setBody] = useState([head]);
 	const [tail, setTail] = useState(body.length - 1);
 	const [food, setFood] = useState();
 
+	// const handleSave = () => {
+	// 	localStorage.setItem('mclennanSnake', true);
+	// 	return setShowInstructions(false);
+	// };
+
+	// const countDownRecursive = number => {
+	// 	if (number > -1) {
+	// 		setCountdown(number);
+	// 		return setTimeout(() => countDownRecursive(number - 1), 1000);
+	// 	} else {
+	// 		window.addEventListener('keydown', ({ keyCode }) => setDirection(keyCode));
+	// 		setGameInPlay(true);
+	// 		keepOnRunnin(moveBody);
+	// 	}
+	// };
+
+	// const handleDismiss = () => {
+	// 	setShowInstructions(false);
+	// 	return countDownRecursive(countdown);
+	// };
+
+	// const keepOnRunnin = callback => {
+	// 	callback();
+	// 	return gameInPlay && setTimeout(() => keepOnRunnin(), 1000);
+	// };
+
+	// useEffect(() => {
+	// 	setFood(placeFood);
+	// }, []);
+
+	// setCountdown(countdown);
+	// setDirection(direction);
+	// setHead(head);
+
+	// useEffect(() => {
+	// 	console.log('hello');
+	// }, [showInstructions === false]);
+
 	const moveBody = () => {
 		switch (direction) {
-			case 'up':
+			case 38:
+				// up
 				body.length < 3
 					? setBody([head - 10, head, ...body])
 					: setBody([head - 10, head, ...body].slice(0, [head - 10, head, ...body].length - 1));
 				return setHead(head - 10);
-			case 'bottom':
+			case 40:
+				// down
 				body.length < 3
 					? setBody([head + 10, head, ...body])
 					: setBody([head + 10, head, ...body].slice(0, [head + 10, head, ...body].length - 1));
 				return setHead(head + 10);
-			case 'left':
+			case 37:
+				// left
 				body.length < 3
 					? setBody([head - 1, head, ...body])
 					: setBody([head - 1, head, ...body].slice(0, [head - 1, head, ...body].length - 1));
 				return setHead(head - 1);
-			case 'right':
+			case 39:
 			default:
+				// right
 				body.length < 3
 					? setBody([head + 1, head, ...body])
 					: setBody([head + 1, head, ...body].slice(0, [head + 1, head, ...body].length - 1));
@@ -50,60 +92,46 @@ const Game = () => {
 		}
 	};
 
-	const placeFood = () => {
+	useEffect(() => {
 		let number = Math.floor(Math.random() * 100);
 		while (number === head || body.includes(number)) {
 			number = Math.floor(Math.random() * 100);
 		}
-		return number;
-	};
-
-	const handleSave = () => {
-		localStorage.setItem('mclennanSnake', true);
-		return setShowInstructions(false);
-	};
-
-	const countDownRecursive = number => {
-		if (number > -1) {
-			setCountdown(number);
-			return setTimeout(() => countDownRecursive(number - 1), 1000);
-		} else if (number === -1) {
-			setGameInPlay(true);
-			keepOnRunnin(moveBody);
-		}
-	};
-
-	const handleDismiss = () => {
-		setShowInstructions(false);
-		return countDownRecursive(countdown);
-	};
-
-	const keepOnRunnin = callback => {
-		callback();
-		console.log(head);
-		return gameInPlay && setTimeout(() => keepOnRunnin(), 1000);
-	};
+		setFood(number);
+	}, [head === food]);
 
 	useEffect(() => {
-		setFood(placeFood);
+		countdown > -1 && setTimeout(() => setCountdown(countdown - 1), 1000);
+		countdown === -1 && setGameInPlay(true);
+		countdown === -1 && setDirection(39);
+	}, [!showInstructions && countdown]);
+
+	useEffect(() => {
 		window.addEventListener('keydown', ({ keyCode }) => {
-			switch (keyCode) {
-				case 38:
-					return setDirection('up');
-				case 40:
-					return setDirection('bottom');
-				case 37:
-					return setDirection('left');
-				case 39:
-				default:
-					return setDirection('right');
-			}
+			setDirection(prevKey => {
+				switch (prevKey) {
+					case 38 && keyCode === 40:
+						return 38;
+					case 40 && keyCode === 38:
+						return 40;
+					case 37 && keyCode === 39:
+						return 37;
+					case 39 && keyCode === 37:
+						return 39;
+					default:
+						return keyCode;
+				}
+			});
 		});
-		return () => {
-			setGameInPlay(false);
-			setCountdown(3);
-		};
-	}, []);
+	}, [!showInstructions && gameInPlay]);
+
+	// useEffect(() => {
+	// 	console.log(direction);
+	// }, [direction]);
+
+	useEffect(() => {
+		// setTimeout(() => )
+	}, [gameInPlay && head]);
 
 	return (
 		<StyledSection>
@@ -125,14 +153,14 @@ const Game = () => {
 						own tail or run into a wall.
 					</StyledP>
 
-					<StyledButton onClick={() => handleDismiss()}>Got it</StyledButton>
+					<StyledButton onClick={() => setShowInstructions(false)}>Got it</StyledButton>
 					<StyledButton onClick={() => handleSave()}>Don't show me this again</StyledButton>
 				</StyledModal>
 			)}
-			{!showInstructions && countdown === 3 && <StyledH6 current={countdown === 3}>{countdown}</StyledH6>}
-			{!showInstructions && countdown === 2 && <StyledH6 current={countdown === 2}>{countdown}</StyledH6>}
-			{!showInstructions && countdown === 1 && <StyledH6 current={countdown === 1}>{countdown}</StyledH6>}
-			{!showInstructions && countdown === 0 && <StyledH6 current={countdown === 0}>GO!</StyledH6>}
+			{countdown === 3 && <StyledH6 current={countdown === 3}>{countdown}</StyledH6>}
+			{countdown === 2 && <StyledH6 current={countdown === 2}>{countdown}</StyledH6>}
+			{countdown === 1 && <StyledH6 current={countdown === 1}>{countdown}</StyledH6>}
+			{countdown === 0 && <StyledH6 current={countdown === 0}>GO!</StyledH6>}
 		</StyledSection>
 	);
 };
