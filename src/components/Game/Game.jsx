@@ -13,92 +13,77 @@ import {
 import { Context } from 'Context/Context';
 
 const Game = () => {
-	const { gameInPlay, setGameInPlay, showGame, showInstructions, setShowInstructions } = useContext(Context);
+	const { gameInPlay, setGameInPlay, showInstructions, setShowInstructions } = useContext(Context);
 
 	const [countdown, setCountdown] = useState(3);
 
-	const [direction, setDirection] = useState(39);
+	const [direction, setDirection] = useState();
 
 	const [head, setHead] = useState(51);
-	const [body, setBody] = useState([head]);
-	const [tail, setTail] = useState(body.length - 1);
+	const [body, setBody] = useState([]);
 	const [food, setFood] = useState();
 
-	// const handleSave = () => {
-	// 	localStorage.setItem('mclennanSnake', true);
-	// 	return setShowInstructions(false);
-	// };
-
-	// const countDownRecursive = number => {
-	// 	if (number > -1) {
-	// 		setCountdown(number);
-	// 		return setTimeout(() => countDownRecursive(number - 1), 1000);
-	// 	} else {
-	// 		window.addEventListener('keydown', ({ keyCode }) => setDirection(keyCode));
-	// 		setGameInPlay(true);
-	// 		keepOnRunnin(moveBody);
-	// 	}
-	// };
-
-	// const handleDismiss = () => {
-	// 	setShowInstructions(false);
-	// 	return countDownRecursive(countdown);
-	// };
-
-	// const keepOnRunnin = callback => {
-	// 	callback();
-	// 	return gameInPlay && setTimeout(() => keepOnRunnin(), 1000);
-	// };
-
-	// useEffect(() => {
-	// 	setFood(placeFood);
-	// }, []);
-
-	// setCountdown(countdown);
-	// setDirection(direction);
-	// setHead(head);
-
-	// useEffect(() => {
-	// 	console.log('hello');
-	// }, [showInstructions === false]);
-
-	const moveBody = () => {
+	const getNextSquare = () => {
 		switch (direction) {
-			case 38:
-				// up
-				body.length < 3
-					? setBody([head - 10, head, ...body])
-					: setBody([head - 10, head, ...body].slice(0, [head - 10, head, ...body].length - 1));
-				return setHead(head - 10);
-			case 40:
-				// down
-				body.length < 3
-					? setBody([head + 10, head, ...body])
-					: setBody([head + 10, head, ...body].slice(0, [head + 10, head, ...body].length - 1));
-				return setHead(head + 10);
-			case 37:
-				// left
-				body.length < 3
-					? setBody([head - 1, head, ...body])
-					: setBody([head - 1, head, ...body].slice(0, [head - 1, head, ...body].length - 1));
-				return setHead(head - 1);
-			case 39:
+			case 38: // up
+				return head - 10;
+			case 40: // down
+				return head + 10;
+			case 37: // left
+				return head - 1;
+			case 39: // right
 			default:
-				// right
-				body.length < 3
-					? setBody([head + 1, head, ...body])
-					: setBody([head + 1, head, ...body].slice(0, [head + 1, head, ...body].length - 1));
-				return setHead(head + 1);
+				return head + 1;
 		}
 	};
 
-	useEffect(() => {
+	const getRandomFood = () => {
 		let number = Math.floor(Math.random() * 100);
 		while (number === head || body.includes(number)) {
 			number = Math.floor(Math.random() * 100);
 		}
-		setFood(number);
-	}, [head === food]);
+		return number;
+	};
+
+	const nextMoveIsInvalid = (currentHead, nextHead) => {
+		if (
+			// Player hit Right Wall
+			(currentHead === 9 && nextHead === 10) ||
+			(currentHead === 19 && nextHead === 20) ||
+			(currentHead === 29 && nextHead === 30) ||
+			(currentHead === 39 && nextHead === 40) ||
+			(currentHead === 49 && nextHead === 50) ||
+			(currentHead === 59 && nextHead === 60) ||
+			(currentHead === 69 && nextHead === 70) ||
+			(currentHead === 79 && nextHead === 80) ||
+			(currentHead === 89 && nextHead === 90)
+		) {
+			return true;
+		} else if (
+			// Player hit Left Wall
+			(currentHead === 10 && nextHead === 9) ||
+			(currentHead === 20 && nextHead === 19) ||
+			(currentHead === 30 && nextHead === 29) ||
+			(currentHead === 40 && nextHead === 39) ||
+			(currentHead === 50 && nextHead === 49) ||
+			(currentHead === 60 && nextHead === 59) ||
+			(currentHead === 70 && nextHead === 69) ||
+			(currentHead === 80 && nextHead === 79) ||
+			(currentHead === 90 && nextHead === 89)
+		) {
+			return true;
+		} else if (nextHead > 100 || nextHead < 0) {
+			// Player hit Top + Bottom Walls
+			return true;
+		} else if (body.includes(nextHead)) {
+			// Player hit Own Tail
+			return true;
+		}
+	};
+
+	useEffect(() => {
+		setFood(getRandomFood);
+	}, []);
 
 	useEffect(() => {
 		countdown > -1 && setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -108,30 +93,34 @@ const Game = () => {
 
 	useEffect(() => {
 		window.addEventListener('keydown', ({ keyCode }) => {
-			setDirection(prevKey => {
-				switch (prevKey) {
-					case 38 && keyCode === 40:
-						return 38;
-					case 40 && keyCode === 38:
-						return 40;
-					case 37 && keyCode === 39:
-						return 37;
-					case 39 && keyCode === 37:
-						return 39;
-					default:
-						return keyCode;
-				}
-			});
+			let nextDirection;
+			switch (keyCode) {
+				case 38 && direction === 40:
+					nextDirection = 38;
+				case 40 && direction === 38:
+					nextDirection = 40;
+				case 37 && direction === 39:
+					nextDirection = 37;
+				case 39 && direction === 37:
+					nextDirection = 39;
+				default:
+					nextDirection = keyCode;
+			}
+			setDirection(nextDirection);
 		});
 	}, [!showInstructions && gameInPlay]);
 
-	// useEffect(() => {
-	// 	console.log(direction);
-	// }, [direction]);
-
 	useEffect(() => {
-		// setTimeout(() => )
-	}, [gameInPlay && head]);
+		if (head === food) {
+			setFood(getRandomFood);
+			setBody([head, ...body]);
+		} else {
+			body.length < 3 ? setBody([head, ...body]) : setBody([head, ...body.slice(0, body.length - 1)]);
+		}
+		const nextHead = getNextSquare();
+		const playerHasLost = nextMoveIsInvalid(head, nextHead);
+		playerHasLost ? setGameInPlay(false) : setTimeout(() => setHead(nextHead), 250);
+	}, [head]);
 
 	return (
 		<StyledSection>

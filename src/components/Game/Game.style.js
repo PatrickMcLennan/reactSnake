@@ -10,7 +10,7 @@ export const StyledBoard = styled.div`
 	bottom: 20%;
 	left: 10%;
 	border: 1px solid black;
-	transition: all 0.3s ease-in-out;
+	transition: all 0.075s ease-in-out;
 	z-index: -2;
 
 	${({ gameInPlay }) =>
@@ -34,7 +34,6 @@ export const StyledGameCell = styled.div`
 	${({ body }) =>
 		body &&
 		css`
-			padding: 10%;
 			background-color: black;
 		`}
 
