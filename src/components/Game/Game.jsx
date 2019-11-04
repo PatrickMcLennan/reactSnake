@@ -4,18 +4,25 @@ import {
 	StyledButton,
 	StyledGameCell,
 	StyledH4,
+	StyledH5,
 	StyledH6,
 	StyledModal,
 	StyledP,
-	StyledSection
+	StyledScoreBox,
+	StyledSection,
+	StyledSpan
 } from './Game.style';
 
 import { Context } from 'Context/Context';
 
 const Game = () => {
-	const { gameInPlay, setGameInPlay, showInstructions, setShowInstructions } = useContext(Context);
+	const { changePage, gameInPlay, setGameInPlay, showInstructions, setShowInstructions, topScores } = useContext(
+		Context
+	);
 
 	const [countdown, setCountdown] = useState(3);
+	const [playerHasLost, setPlayerHasLost] = useState(false);
+	const [playerName, setPlayerName] = useState('');
 
 	const [direction, setDirection] = useState();
 
@@ -23,6 +30,7 @@ const Game = () => {
 	const [body, setBody] = useState([]);
 	const [food, setFood] = useState();
 
+	// Get Heads next square #
 	const getNextSquare = () => {
 		switch (direction) {
 			case 38: // up
@@ -37,6 +45,32 @@ const Game = () => {
 		}
 	};
 
+	// Change Heads direction on keydown, prevent Head from colliding with Neck
+	const handleKeydown = (newDirection, currentDirection) => {
+		if (newDirection === 38 && currentDirection === 40) {
+			// Moving up trying to go down
+			return 40;
+		} else if (newDirection === 40 && currentDirection === 38) {
+			// Moving down trying to go up
+			return 38;
+		} else if (newDirection === 37 && currentDirection === 39) {
+			// Moving left trying to go right
+			return 39;
+		} else if (newDirection === 39 && currentDirection === 37) {
+			// Moving right trying to go left
+			return 37;
+		} else if (![37, 38, 39, 40].includes(newDirection)) {
+			// Not an arrow key
+			return currentDirection;
+		} else {
+			// New direction is valid and non-conflicting
+			return newDirection;
+		}
+	};
+
+	const handleSubmit = () => console.log(playerName);
+
+	// Place food randomly, prevent collision with snake
 	const getRandomFood = () => {
 		let number = Math.floor(Math.random() * 100);
 		while (number === head || body.includes(number)) {
@@ -45,6 +79,7 @@ const Game = () => {
 		return number;
 	};
 
+	// Determine if the Heads next square is Valid
 	const nextMoveIsInvalid = (currentHead, nextHead) => {
 		if (
 			// Player hit Right Wall
@@ -56,7 +91,8 @@ const Game = () => {
 			(currentHead === 59 && nextHead === 60) ||
 			(currentHead === 69 && nextHead === 70) ||
 			(currentHead === 79 && nextHead === 80) ||
-			(currentHead === 89 && nextHead === 90)
+			(currentHead === 89 && nextHead === 90) ||
+			(currentHead === 99 && nextHead === 100)
 		) {
 			return true;
 		} else if (
@@ -73,7 +109,7 @@ const Game = () => {
 		) {
 			return true;
 		} else if (nextHead > 100 || nextHead < 0) {
-			// Player hit Top + Bottom Walls
+			// Player hit Top or Bottom Wall
 			return true;
 		} else if (body.includes(nextHead)) {
 			// Player hit Own Tail
@@ -81,46 +117,48 @@ const Game = () => {
 		}
 	};
 
+	// Set up Game, Reset to Defaults after unmount
 	useEffect(() => {
 		setFood(getRandomFood);
+		setGameInPlay(false);
+		window.addEventListener('keydown', ({ keyCode }) =>
+			setDirection(prevDirection => handleKeydown(keyCode, prevDirection))
+		);
+
+		return () => {
+			setCountdown(3);
+			setGameInPlay(false);
+			setPlayerHasLost(false);
+			setShowInstructions(true);
+		};
 	}, []);
 
+	// Dismiss Instructions, begin Recursive Countdown, Start Game at 0, Start Moving Right
 	useEffect(() => {
-		countdown > -1 && setTimeout(() => setCountdown(countdown - 1), 1000);
-		countdown === -1 && setGameInPlay(true);
-		countdown === -1 && setDirection(39);
-	}, [!showInstructions && countdown]);
+		!showInstructions && countdown > -1 && setTimeout(() => setCountdown(countdown - 1), 1000);
+		!showInstructions && countdown === 0 && setGameInPlay(true);
+		countdown === 0 && setHead(52);
+		countdown === 0 && setDirection(39);
+	}, [countdown, showInstructions]);
 
+	// Decide to move head or end game based on current + next head #'s.
 	useEffect(() => {
-		window.addEventListener('keydown', ({ keyCode }) => {
-			let nextDirection;
-			switch (keyCode) {
-				case 38 && direction === 40:
-					nextDirection = 38;
-				case 40 && direction === 38:
-					nextDirection = 40;
-				case 37 && direction === 39:
-					nextDirection = 37;
-				case 39 && direction === 37:
-					nextDirection = 39;
-				default:
-					nextDirection = keyCode;
-			}
-			setDirection(nextDirection);
-		});
-	}, [!showInstructions && gameInPlay]);
-
-	useEffect(() => {
-		if (head === food) {
+		const nextHead = getNextSquare();
+		if (playerHasLost) {
+			return;
+		} else if (head === food && !playerHasLost) {
 			setFood(getRandomFood);
 			setBody([head, ...body]);
-		} else {
+		} else if (!playerHasLost) {
 			body.length < 3 ? setBody([head, ...body]) : setBody([head, ...body.slice(0, body.length - 1)]);
 		}
-		const nextHead = getNextSquare();
-		const playerHasLost = nextMoveIsInvalid(head, nextHead);
-		playerHasLost ? setGameInPlay(false) : setTimeout(() => setHead(nextHead), 250);
+		setPlayerHasLost(nextMoveIsInvalid(head, nextHead));
+		gameInPlay && setTimeout(() => setHead(nextHead), 125);
 	}, [head]);
+
+	useEffect(() => {
+		setGameInPlay(false);
+	}, [playerHasLost]);
 
 	return (
 		<StyledSection>
@@ -150,6 +188,44 @@ const Game = () => {
 			{countdown === 2 && <StyledH6 current={countdown === 2}>{countdown}</StyledH6>}
 			{countdown === 1 && <StyledH6 current={countdown === 1}>{countdown}</StyledH6>}
 			{countdown === 0 && <StyledH6 current={countdown === 0}>GO!</StyledH6>}
+
+			{playerHasLost && (
+				<StyledModal>
+					<StyledH4>You've Lost</StyledH4>
+					<StyledScoreBox>
+						<StyledSpan>Your Score:</StyledSpan>
+						<StyledH5>{body.length}</StyledH5>
+					</StyledScoreBox>
+					{topScores.filter(({ score }) => score >= body.length).length < 10 ? (
+						<p>Top Score!</p>
+					) : (
+						<p>Not a top score</p>
+					)}
+					{topScores.filter(({ score }) => score >= body.length).length < 10 && (
+						<input value={playerName} onChange={({ target: { value } }) => setPlayerName(value)} />
+					)}
+					<StyledButton
+						onClick={
+							topScores.filter(({ score }) => score >= body.length).length < 10
+								? handleSubmit()
+								: changePage('greeting')
+						}>
+						{topScores.filter(({ score }) => score >= body.length).length < 10
+							? 'Submit Your Score'
+							: 'Go Home'}
+					</StyledButton>
+					<StyledButton
+						onClick={
+							topScores.filter(({ score }) => score >= body.length).length < 10
+								? handleSubmit()
+								: changePage('greeting')
+						}>
+						{topScores.filter(({ score }) => score >= body.length).length < 10
+							? "Nah, let's play again"
+							: 'Try Again'}
+					</StyledButton>
+				</StyledModal>
+			)}
 		</StyledSection>
 	);
 };

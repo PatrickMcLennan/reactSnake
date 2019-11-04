@@ -113,3 +113,24 @@ export const StyledH6 = styled.h6`
 			`;
 	}}
 `;
+
+export const StyledScoreBox = styled.div`
+	${({ theme: { flexin } }) => flexin()};
+	padding: 10px 0;
+	text-align: center;
+`;
+
+export const StyledH5 = styled.h5`
+	font-size: 30px;
+	font-weight: 300;
+	line-height: 35px;
+`;
+
+export const StyledSpan = styled.span`
+	font-size: 18px;
+	font-weight: 100;
+	line-height: 22px;
+	text-transform: uppercase;
+	letter-spacing: 0.75px;
+	margin-right: 20px;
+`;
