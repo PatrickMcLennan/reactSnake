@@ -20,15 +20,60 @@ const ContextProvider = ({ children }) => {
 	};
 
 	useEffect(() => {
-		/**
-		 * Make API call here ...
-		 */
+		const serverCall = new XMLHttpRequest();
+
+		serverCall.addEventListener('progress', e => {
+			let percent = (e.loaded / e.total) * 100;
+			// Update loader bar here
+			console.log(percent);
+		});
+
+		serverCall.addEventListener('load', e => {
+			setTopScores();
+		});
+
+		serverCall.addEventListener('error', e => {
+			console.error(e);
+		});
+
+		serverCall.addEventListener('abort', e => {
+			console.error('The user cancelled this call');
+		});
+
+		serverCall.open('GET', 'https://www.myserver.com/getScores', true);
+		serverCall.send();
+
 		return setTopScores(
 			[...Array(10).keys()].map(number => {
 				return { rank: number, name: `Player ${number}`, score: `${10 - number}` };
 			})
 		);
 	}, []);
+
+	useEffect(() => {
+		const serverCall = new XMLHttpRequest();
+
+		serverCall.addEventListener('progress', e => {
+			let percent = (e.loaded / e.total) * 100;
+			// Update loader bar here
+			console.log(percent);
+		});
+
+		serverCall.addEventListener('load', e => {
+			console.log('The call is complete');
+		});
+
+		serverCall.addEventListener('error', e => {
+			console.error(e);
+		});
+
+		serverCall.addEventListener('abort', e => {
+			console.error('The user cancelled this call');
+		});
+
+		serverCall.open('POST', 'https://www.myserver.com/postScores', true);
+		serverCall.send(topScores);
+	}, [topScores]);
 
 	return (
 		<Context.Provider
