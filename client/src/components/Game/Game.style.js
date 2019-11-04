@@ -1,4 +1,14 @@
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+
+const fadeAway = keyframes`
+    from {
+        transform: translate(-50%, -500%);
+        opacity: 1;
+    } to {
+        transform: translate(-50%, -1000%);
+        opacity: 0;
+    }
+`;
 
 export const StyledBoard = styled.div`
 	position: absolute;
@@ -100,18 +110,15 @@ export const StyledH6 = styled.h6`
 	font-size: 20vh;
 	line-height: 24px;
 	letter-spacing: 1px;
-	opacity: 0;
 	transition: all 1s ease-in-out;
 	transform: translate(-50%, -500%);
 	z-index: 0;
 
-	${({ current }) => {
-		current &&
-			css`
-				transform: translate(-50%, -200%);
-				opacity: 1;
-			`;
-	}}
+	${({ showInstructions }) =>
+		!showInstructions &&
+		css`
+			animation: ${fadeAway} 1s linear;
+		`}
 `;
 
 export const StyledScoreBox = styled.div`
@@ -133,4 +140,27 @@ export const StyledSpan = styled.span`
 	text-transform: uppercase;
 	letter-spacing: 0.75px;
 	margin-right: 20px;
+`;
+
+export const StyledInput = styled.input`
+	position: relative;
+	width: 75%;
+	margin: 15px 12.5%;
+	background: none;
+	border: none;
+	border-left: 2px solid black;
+	font-size: 20px;
+	line-height: 24px;
+	letter-spacing: 0.25px;
+	text-align: center;
+`;
+
+export const StyledLengthIndicator = styled.div`
+	margin: 10px 0;
+	height: 1px;
+	width: 100%;
+	background-color: black;
+	transform-origin: center;
+	transition: all 0.3s ease-in-out;
+	transform: ${props => `scaleX(${props.nameLength * 0.015})`};
 `;

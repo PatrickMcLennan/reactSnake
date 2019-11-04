@@ -6,6 +6,8 @@ import {
 	StyledH4,
 	StyledH5,
 	StyledH6,
+	StyledInput,
+	StyledLengthIndicator,
 	StyledModal,
 	StyledP,
 	StyledScoreBox,
@@ -184,10 +186,10 @@ const Game = () => {
 					<StyledButton onClick={() => handleSave()}>Don't show me this again</StyledButton>
 				</StyledModal>
 			)}
-			{countdown === 3 && <StyledH6 current={countdown === 3}>{countdown}</StyledH6>}
-			{countdown === 2 && <StyledH6 current={countdown === 2}>{countdown}</StyledH6>}
-			{countdown === 1 && <StyledH6 current={countdown === 1}>{countdown}</StyledH6>}
-			{countdown === 0 && <StyledH6 current={countdown === 0}>GO!</StyledH6>}
+			{countdown === 3 && <StyledH6 showInstructions={showInstructions}>{countdown}</StyledH6>}
+			{countdown === 2 && <StyledH6 showInstructions={showInstructions}>{countdown}</StyledH6>}
+			{countdown === 1 && <StyledH6 showInstructions={showInstructions}>{countdown}</StyledH6>}
+			{countdown === 0 && <StyledH6 showInstructions={showInstructions}>GO!</StyledH6>}
 
 			{playerHasLost && (
 				<StyledModal>
@@ -202,7 +204,13 @@ const Game = () => {
 						<p>Not a top score</p>
 					)}
 					{topScores.filter(({ score }) => score >= body.length).length < 10 && (
-						<input value={playerName} onChange={({ target: { value } }) => setPlayerName(value)} />
+						<>
+							<StyledInput
+								value={playerName}
+								onChange={({ target: { value } }) => setPlayerName(value)}
+							/>
+							<StyledLengthIndicator nameLength={playerName.length} />
+						</>
 					)}
 					<StyledButton
 						onClick={
