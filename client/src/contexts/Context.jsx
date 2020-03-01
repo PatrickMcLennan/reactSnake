@@ -22,14 +22,15 @@ const ContextProvider = ({ children }) => {
 	useEffect(() => {
 		const serverCall = new XMLHttpRequest();
 
-		serverCall.addEventListener('progress', e => {
-			let percent = (e.loaded / e.total) * 100;
+		serverCall.addEventListener('progress', ({ loaded, total }) => {
+			let percent = (loaded / total) * 100;
 			// Update loader bar here
 			console.log(percent);
 		});
 
 		serverCall.addEventListener('load', e => {
-			setTopScores();
+			// setTopScores();
+			console.log(e);
 		});
 
 		serverCall.addEventListener('error', e => {

@@ -144,15 +144,23 @@ export const StyledSpan = styled.span`
 
 export const StyledInput = styled.input`
 	position: relative;
-	width: 75%;
-	margin: 15px 12.5%;
+	width: 50%;
+	margin: 15px 25%;
 	background: none;
 	border: none;
 	border-left: 2px solid black;
+	border-right: 2px solid black;
 	font-size: 20px;
 	line-height: 24px;
 	letter-spacing: 0.25px;
 	text-align: center;
+
+	${({ playerNameError }) =>
+		playerNameError &&
+		css`
+			border-left: 2px solid red;
+			border-right: 2px solid red;
+		`}
 `;
 
 export const StyledLengthIndicator = styled.div`

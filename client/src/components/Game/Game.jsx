@@ -25,6 +25,7 @@ const Game = () => {
 	const [countdown, setCountdown] = useState(3);
 	const [playerHasLost, setPlayerHasLost] = useState(false);
 	const [playerName, setPlayerName] = useState('');
+	const [playerNameError, setPlayerNameError] = useState('');
 
 	const [direction, setDirection] = useState();
 
@@ -208,6 +209,7 @@ const Game = () => {
 							<StyledInput
 								value={playerName}
 								onChange={({ target: { value } }) => setPlayerName(value)}
+								playerNameError={playerNameError}
 							/>
 							<StyledLengthIndicator nameLength={playerName.length} />
 						</>
